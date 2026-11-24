@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sueño y descanso · Calculadoras para el entrenador</title>
+<style>
+:root{
+  --navy:#13294B; --teal:#00918F; --teal-soft:#E3F3F2; --coral:#D94A26; --coral-soft:#FBE9E4;
+  --amber:#B7791F; --amber-soft:#FBF1DE; --green:#2F7D4F; --green-soft:#E5F2EA;
+  --ink:#1E2A33; --grey:#5B6B78; --line:#D5DDE3; --bg:#FFFFFF; --bg2:#F2F5F7; --card:#FFFFFF;
+  --light:#F4C542; --dark:#1F2F45; --darkseg:#1F2F45; --nightband:#C9D3DB; --tick:#B8C4CE; --grid:#EEF2F5; --band:#EAF0F5;
+  --sleepbar:#13294B; --onnavy:#FFFFFF;
+  --serif:'Times New Roman', Times, serif; --sans:Calibri, Carlito, 'Segoe UI', Arial, sans-serif;
+}
+[data-theme=dark]{
+  color-scheme:dark;
+  --navy:#E3ECF6; --teal:#35C2BE; --teal-soft:#10393A; --coral:#F2714D; --coral-soft:#3B2119;
+  --amber:#E4B04F; --amber-soft:#3A2E13; --green:#62C78A; --green-soft:#14301F;
+  --ink:#E6ECF1; --grey:#9FB0BE; --line:#2B3947; --bg:#0F1720; --bg2:#18232F; --card:#131D27;
+  --light:#F4C542; --dark:#7C90AB; --darkseg:#6C819E; --nightband:#2F4054; --tick:#3E4F61; --grid:#1D2A37; --band:#1B2A3B;
+  --sleepbar:#3C609A; --onnavy:#0F1720;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.45}
+header{border-bottom:1px solid var(--line);padding:22px 40px 0}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+h1{font-family:var(--serif);font-weight:normal;font-size:2rem;color:var(--navy);margin:0}
+.sub{color:var(--grey);font-size:.95rem;margin-top:4px}
+.keys{color:var(--grey);font-size:.85rem}
+.keys kbd{border:1px solid var(--line);border-radius:4px;padding:0 6px;font-family:var(--sans);background:var(--bg2)}
+nav{display:flex;gap:4px;margin-top:18px}
+nav button{font:inherit;font-size:1.05rem;background:none;border:0;border-bottom:3px solid transparent;padding:10px 18px 12px;color:var(--grey);cursor:pointer}
+nav button .n{font-family:var(--serif);color:var(--teal);margin-right:8px}
+nav button[aria-selected=true]{color:var(--navy);border-bottom-color:var(--teal);font-weight:bold}
+nav button:hover{color:var(--navy)}
+main{padding:28px 40px 20px;max-width:1440px;margin:0 auto}
+section.tab{display:none}
+section.tab.on{display:block}
+.intro{display:flex;justify-content:space-between;align-items:baseline;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+.intro h2{font-family:var(--serif);font-weight:normal;color:var(--navy);font-size:1.7rem;margin:0}
+.intro p{margin:4px 0 0;color:var(--grey);max-width:760px}
+.presets{display:flex;gap:8px;flex-wrap:wrap}
+.presets button{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 14px;cursor:pointer;color:var(--navy)}
+.presets button:hover{border-color:var(--teal);color:var(--teal)}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:32px;align-items:start}
+.panel{background:var(--bg2);border-radius:8px;padding:20px 22px}
+.field{margin-bottom:18px}
+.field:last-child{margin-bottom:0}
+.field label,.field .lab{display:block;font-weight:bold;font-size:.95rem;margin-bottom:6px;color:var(--navy)}
+.field .hint{font-size:.82rem;color:var(--grey);margin-top:4px}
+input[type=time],input[type=date],input[type=number],select{font:inherit;font-size:1.05rem;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.rangeval{font-family:var(--serif);font-size:1.3rem;color:var(--navy);float:right;font-weight:normal}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--card)}
+.seg button{flex:1;font:inherit;font-size:.95rem;border:0;background:var(--card);padding:7px 4px;cursor:pointer;color:var(--grey);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--navy);color:var(--onnavy)}
+.check{display:flex;gap:8px;align-items:center;font-size:.95rem;cursor:pointer;margin-bottom:8px}
+.check input{width:18px;height:18px;accent-color:var(--teal)}
+.sub-fields{padding-left:2px}
+.sub-fields.off{opacity:.35;pointer-events:none}
+.hero{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;align-items:start;margin-bottom:18px}
+.big .k{font-size:.9rem;color:var(--grey);text-transform:uppercase;letter-spacing:.06em}
+.big .v{font-family:var(--serif);font-size:3.6rem;white-space:nowrap;line-height:1;color:var(--navy)}
+.big .v small{font-size:1.6rem;color:var(--grey)}
+.big .d{font-size:.95rem;color:var(--grey);margin-top:6px}
+.big.accent .v{color:var(--teal)}
+.big.warn .v{color:var(--coral)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:16px}
+.card{border:1px solid var(--line);border-left:4px solid var(--grey);border-radius:6px;padding:12px 14px;background:var(--card)}
+.card h4{margin:0 0 4px;font-size:1rem;color:var(--navy);display:flex;gap:8px;align-items:center}
+.card p{margin:0;font-size:.95rem}
+.card .cite{color:var(--grey);font-size:.82rem;margin-top:6px}
+.card.ok{border-left-color:var(--green)} .card.ok h4 .tag{background:var(--green-soft);color:var(--green)}
+.card.mid{border-left-color:var(--amber)} .card.mid h4 .tag{background:var(--amber-soft);color:var(--amber)}
+.card.bad{border-left-color:var(--coral)} .card.bad h4 .tag{background:var(--coral-soft);color:var(--coral)}
+.card.info{border-left-color:var(--teal)} .card.info h4 .tag{background:var(--teal-soft);color:var(--teal)}
+.tag{font-size:.75rem;font-weight:bold;padding:1px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em}
+.chart{border:1px solid var(--line);border-radius:6px;padding:12px 14px 8px;background:var(--card)}
+.chart .ttl{font-size:.9rem;color:var(--grey);margin-bottom:6px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--grey);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+svg text{font-family:var(--sans)}
+table.plan{width:100%;border-collapse:collapse;font-size:.95rem}
+table.plan th{text-align:left;font-weight:bold;color:var(--grey);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.plan td{padding:6px 8px;border-bottom:1px solid var(--bg2);vertical-align:middle}
+table.plan td.day{font-weight:bold;color:var(--navy);white-space:nowrap}
+table.plan td.strip{width:46%}
+.pill{display:inline-block;font-size:.78rem;padding:1px 8px;border-radius:10px;background:var(--teal-soft);color:var(--teal);font-weight:bold;margin-left:6px}
+.note{font-size:.85rem;color:var(--grey);margin-top:12px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.fact{border-top:3px solid var(--navy);padding-top:8px}
+.fact .v{font-family:var(--serif);font-size:2.1rem;color:var(--navy);line-height:1.1}
+.fact .t{font-size:.9rem;color:var(--grey)}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:16px 40px 30px;color:var(--grey);font-size:.85rem}
+footer details summary{cursor:pointer;color:var(--navy);font-weight:bold;font-size:.9rem}
+footer ol{padding-left:18px}
+footer li{margin-bottom:6px;padding-left:1.6em;text-indent:-1.6em;list-style:none}
+.big .v small{white-space:nowrap}
+@media (max-width:980px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.facts{grid-template-columns:1fr}header,main,footer{padding-left:20px;padding-right:20px}}
+
+.theme{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--card);color:var(--navy);border-radius:20px;padding:5px 14px;cursor:pointer;margin-left:10px}
+.theme:hover{border-color:var(--teal);color:var(--teal)}
+.how{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:.95rem;background:var(--card)}
+.how b{color:var(--navy)}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div>
+      <h1>Sueño y descanso en el deportista</h1>
+      <div class="sub">Calculadoras para el entrenador · Sergio Cebrián · David Pérez · CAFYD, UAM</div>
+    </div>
+    <div class="keys">Teclas <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> cambian de calculadora · <kbd>D</kbd> modo oscuro<button class="theme" id="theme" type="button">☾ Modo oscuro</button></div>
+  </div>
+  <nav role="tablist">
+    <button role="tab" data-t="t1" aria-selected="true"><span class="n">1</span>Hora de dormir</button>
+    <button role="tab" data-t="t2" aria-selected="false"><span class="n">2</span>Jet lag</button>
+    <button role="tab" data-t="t3" aria-selected="false"><span class="n">3</span>Cafeína</button>
+    <button role="tab" data-t="t4" aria-selected="false"><span class="n">4</span>Cronotipo y entreno</button>
+  </nav>
+</header>
+
+<main>
+<!-- ============ 1. HORA DE DORMIR ============ -->
+<section class="tab on" id="t1">
+  <div class="intro">
+    <div><h2>¿A qué hora debería acostarse?</h2>
+    <p>Dices a qué hora se levanta y calcula cuándo acostarse. Después comprueba si el entreno, la cena y el café de hoy encajan.</p></div>
+    <div class="presets">
+      <button data-p1="base">Día normal</button>
+      <button data-p1="tarde">Entreno hasta las 22:30</button>
+      <button data-p1="madruga">Madruga a las 6:00</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="field"><label for="p_wake">Se levanta mañana a las</label><input type="time" id="p_wake" value="07:30"></div>
+      <div class="field"><label for="p_hours">Horas en la cama <span class="rangeval" id="p_hours_v">9 h</span></label>
+        <input type="range" id="p_hours" min="7" max="10" step="0.25" value="9">
+        <div class="hint">Lo normal es 7–9 h. Los deportistas jóvenes necesitan 8–9 h, y en los estudios que mejoraron el rendimiento se dormía 9–10 h en la cama.</div></div>
+      <div class="field">
+        <label class="check"><input type="checkbox" id="p_tr_on" checked> Entrena esta tarde o noche</label>
+        <div class="sub-fields" id="p_tr_box">
+          <div class="row2">
+            <div><span class="lab">Termina a las</span><input type="time" id="p_tr_end" value="19:30"></div>
+            <div><span class="lab">Intensidad</span><select id="p_tr_int"><option value="mod">Moderada</option><option value="vig">Vigorosa</option></select></div>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label for="p_dinner">Cena a las</label><input type="time" id="p_dinner" value="21:00"></div>
+      <div class="field">
+        <label class="check"><input type="checkbox" id="p_caf_on" checked> Ha tomado cafeína hoy</label>
+        <div class="sub-fields" id="p_caf_box"><span class="lab">Última toma a las</span><input type="time" id="p_caf" value="17:00"></div>
+      </div>
+      <div class="field"><label class="check"><input type="checkbox" id="p_ocs"> Toma anticonceptivos orales</label></div>
+    </div>
+    <div>
+      <div class="hero">
+        <div class="big accent"><div class="k">A la cama</div><div class="v" id="r_bed">22:30</div><div class="d" id="r_bed_d"></div></div>
+        <div class="big"><div class="k">Cena ideal</div><div class="v" id="r_din">18:30</div><div class="d">Unas 4 h antes de acostarse: lo que mejor funcionó en un estudio (Doherty et al., 2019)</div></div>
+        <div class="big"><div class="k">Última cafeína</div><div class="v" id="r_cafcut">16:30</div><div class="d" id="r_cafcut_d"></div></div>
+      </div>
+      <div class="chart"><div class="ttl">Su tarde y su noche</div><svg id="p_svg" width="100%" height="120" viewBox="0 0 1000 120" preserveAspectRatio="none"></svg>
+        <div class="legend"><span><i style="background:var(--sleepbar)"></i>Sueño</span><span><i style="background:var(--teal)"></i>Entreno</span><span><i style="background:var(--coral-soft);border:1px solid var(--coral)"></i>Sin cafeína</span><span><i style="background:var(--amber)"></i>Cena</span><span><i style="background:var(--coral)"></i>Cafeína</span></div>
+      </div>
+      <div class="cards" id="p_cards"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. JET LAG ============ -->
+<section class="tab" id="t2">
+  <div class="intro">
+    <div><h2>¿Cuántos días tarda en adaptarse?</h2>
+    <p>Un huso es una franja horaria. Hacia el oeste hace falta medio día de adaptación por huso; hacia el este, un día. Abajo sale un plan de luz día a día (Roach y Sargent, 2019).</p></div>
+    <div class="presets">
+      <button data-p2="tokio">Madrid → Tokio</button>
+      <button data-p2="ny">Madrid → Nueva York</button>
+      <button data-p2="sydney">Madrid → Sídney</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="field"><label for="j_from">Origen</label><select id="j_from"></select></div>
+      <div class="field"><label for="j_to">Destino</label><select id="j_to"></select></div>
+      <div class="field"><label for="j_date">Fecha de llegada</label><input type="date" id="j_date"><div class="hint">Se usa para tener en cuenta el cambio de hora de verano.</div></div>
+      <div class="field"><div class="row2">
+        <div><label for="j_bed">Se acuesta</label><input type="time" id="j_bed" value="23:00"></div>
+        <div><label for="j_wake">Se levanta</label><input type="time" id="j_wake" value="07:00"></div></div>
+        <div class="hint">Su horario normal en casa: es el que quiere tener también en destino.</div></div>
+      <div class="field"><label class="check"><input type="checkbox" id="j_mel"> Mostrar melatonina (3 mg)</label><div class="hint">Antes de usarla, revisar el producto por antidopaje.</div></div>
+    </div>
+    <div>
+      <div class="hero">
+        <div class="big"><div class="k">Diferencia</div><div class="v" id="j_diff">8 <small>husos</small></div><div class="d" id="j_dir"></div></div>
+        <div class="big accent"><div class="k">Adaptación completa</div><div class="v" id="j_days">≈ 8 <small>días</small></div><div class="d" id="j_rule"></div></div>
+        <div class="big"><div class="k">Adaptación parcial</div><div class="v" id="j_part">Día 3</div><div class="d">Desde ese día el punto más bajo del reloj interno ya cae durante su sueño y debería dormir mejor</div></div>
+      </div>
+      <div class="chart">
+        <div class="ttl">Plan de luz, hora local del destino</div>
+        <table class="plan"><thead><tr><th>Día</th><th>00 · 06 · 12 · 18 · 24 h</th><th>Buscar luz</th><th>Evitar luz</th><th class="melcol">Melatonina</th></tr></thead><tbody id="j_tbody"></tbody></table>
+        <div class="legend"><span><i style="background:var(--light)"></i>Buscar luz (sol, sin gafas)</span><span><i style="background:var(--dark)"></i>Evitar luz (dormir o gafas oscuras)</span><span><i style="background:var(--nightband)"></i>Horario de sueño</span><span>▼ Punto más bajo del reloj interno</span><span class="melcol">● Melatonina</span></div>
+      </div>
+      <div class="cards" id="j_cards"></div>
+      <div class="note">El reloj interno tiene un punto más bajo, el momento de menos energía, que se supone unas 3 h antes de la hora de levantarse. La luz antes de ese punto retrasa el reloj y la luz después lo adelanta (Roach y Sargent, 2019). Si una ventana de luz cae mientras duerme, se ignora. Es un plan orientativo y no está probado en deportistas.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. CAFEÍNA ============ -->
+<section class="tab" id="t3">
+  <div class="intro">
+    <div><h2>¿Hasta qué hora puede tomar cafeína?</h2>
+    <p>Calcula cuánta cafeína toma y cuánta le queda en el cuerpo cuando se acuesta. Datos de Kocak et al. (2025).</p></div>
+    <div class="presets">
+      <button data-p3="partido">Partido a las 20:00</button>
+      <button data-p3="manana">Entreno de mañana</button>
+      <button data-p3="ocs">Con anticonceptivos</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="field"><label for="c_kg">Peso <span class="rangeval" id="c_kg_v">70 kg</span></label><input type="range" id="c_kg" min="40" max="120" step="1" value="70"></div>
+      <div class="field"><label for="c_dose">Dosis <span class="rangeval" id="c_dose_v">3 mg/kg</span></label><input type="range" id="c_dose" min="1" max="6" step="0.5" value="3"><div class="hint">Dosis eficaz habitual: 3–6 mg/kg</div></div>
+      <div class="field"><label for="c_time">Toma a las</label><input type="time" id="c_time" value="18:00"></div>
+      <div class="field"><label for="c_bed">Se acuesta a las</label><input type="time" id="c_bed" value="23:00"></div>
+      <div class="field"><span class="lab">Vida media</span>
+        <div class="seg" id="c_hl"><button data-v="4">4 h</button><button data-v="5" class="on">5 h</button><button data-v="6">6 h</button><button data-v="10.7">10,7 h</button></div>
+        <div class="hint">Es el tiempo que tarda el cuerpo en eliminar la mitad de la cafeína. Lo normal es 4–6 h; con anticonceptivos orales, 10,7 h.</div></div>
+    </div>
+    <div>
+      <div class="hero">
+        <div class="big"><div class="k">Dosis</div><div class="v" id="c_mg">210 <small>mg</small></div><div class="d" id="c_mg_d"></div></div>
+        <div class="big" id="c_left_box"><div class="k">Queda al acostarse</div><div class="v" id="c_left">95 <small>mg</small></div><div class="d" id="c_left_d"></div></div>
+        <div class="big accent"><div class="k">Última toma recomendada</div><div class="v" id="c_cut">17:00</div><div class="d" id="c_cut_d"></div></div>
+      </div>
+      <div class="chart"><div class="ttl">Cuánta cafeína queda en el cuerpo (cálculo simplificado)</div><svg id="c_svg" width="100%" height="230" viewBox="0 0 1000 230" preserveAspectRatio="none"></svg></div>
+      <div class="facts">
+        <div class="fact"><div class="v">−32 min</div><div class="t">menos de sueño de media, pero no es concluyente: el rango posible va de −72 a +7 min (p = 0,08)</div></div>
+        <div class="fact"><div class="v">−4,87 %</div><div class="t">de eficiencia del sueño (tiempo dormido sobre el tiempo en la cama), resultado poco sólido</div></div>
+        <div class="fact"><div class="v">4 de 6</div><div class="t">estudios en los que el deportista dijo dormir peor</div></div>
+      </div>
+      <div class="note">Kocak et al. (2025): 10 estudios con 128 deportistas que tomaron 3–6 mg/kg por la tarde-noche. Incluso 6 h antes de acostarse, la cafeína recortó 41 min de sueño. El cálculo solo mide cómo se elimina; en la realidad el máximo en sangre llega a los 60–120 min de tomarla.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. CRONOTIPO ============ -->
+<section class="tab" id="t4">
+  <div class="intro">
+    <div><h2>Cronotipo y hora de entrenamiento</h2>
+    <p>El cronotipo indica si la persona rinde mejor por la mañana (matutino) o por la tarde (vespertino). Aquí se cruza con la hora del entreno y con lo que durmió anoche.</p></div>
+    <div class="presets">
+      <button data-p4="buho">Vespertino a las 7:30</button>
+      <button data-p4="alondra">Matutino a las 21:00</button>
+      <button data-p4="partido">Noche corta y partido</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="field"><span class="lab">Cronotipo</span>
+        <div class="seg" id="k_type"><button data-v="m">Matutino</button><button data-v="i" class="on">Intermedio</button><button data-v="v">Vespertino</button></div>
+        <div class="hint">Lo que la persona dice de sí misma. En Zhang et al. (2022) se sacaba con 4 preguntas del cuestionario ASSQ.</div></div>
+      <div class="field"><label for="k_wake">Se levantó a las</label><input type="time" id="k_wake" value="07:30"></div>
+      <div class="field"><label for="k_train">Entrena o compite a las</label><input type="time" id="k_train" value="18:00"></div>
+      <div class="field"><label for="k_slept">Anoche durmió <span class="rangeval" id="k_slept_v">7,5 h</span></label><input type="range" id="k_slept" min="3" max="10" step="0.5" value="7.5"></div>
+    </div>
+    <div>
+      <div class="hero">
+        <div class="big"><div class="k">Horas despierto al entrenar</div><div class="v" id="k_awake">10,5 <small>h</small></div><div class="d" id="k_awake_d"></div></div>
+        <div class="big" id="k_drop_box"><div class="k">Caída estimada</div><div class="v" id="k_drop">—</div><div class="d" id="k_drop_d"></div></div>
+        <div class="big accent"><div class="k">Siesta</div><div class="v" id="k_nap">—</div><div class="d" id="k_nap_d"></div></div>
+      </div>
+      <div class="cards" id="k_cards"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  Herramienta docente. Las cifras son orientativas, salen de los artículos del trabajo y no sustituyen a un profesional.
+  <details><summary>Referencias (APA 7)</summary><ol>
+    <li>Coel, R. A., Pujalte, G. G. A., Applewhite, A. I., Zaslow, T., Cooper, G., Ton, A. N. y Benjamin, H. J. (2023). Sleep and the young athlete. <i>Sports Health, 15</i>(4), 537–546. https://doi.org/10.1177/19417381221108732</li>
+    <li>Craven, J., McCartney, D., Desbrow, B., Sabapathy, S., Bellinger, P., Roberts, L. e Irwin, C. (2022). Effects of acute sleep loss on physical performance: A systematic and meta-analytical review. <i>Sports Medicine, 52</i>(11), 2669–2690. https://doi.org/10.1007/s40279-022-01706-y</li>
+    <li>Cunha, L. A., Costa, J. A., Marques, E. A., Brito, J., Lastella, M. y Figueiredo, P. (2023). The impact of sleep interventions on athletic performance: A systematic review. <i>Sports Medicine – Open, 9</i>(1), 58. https://doi.org/10.1186/s40798-023-00599-z</li>
+    <li>Doherty, R., Madigan, S., Warrington, G. y Ellis, J. (2019). Sleep and nutrition interactions: Implications for athletes. <i>Nutrients, 11</i>(4), 822. https://doi.org/10.3390/nu11040822</li>
+    <li>Driller, M. W., Dunican, I. C., Omond, S. E. T., Boukhris, O., Stevenson, S., Lambing, K. y Bender, A. M. (2023). Pyjamas, polysomnography and professional athletes: The role of sleep tracking technology in sport. <i>Sports, 11</i>(1), 14. https://doi.org/10.3390/sports11010014</li>
+    <li>Janse van Rensburg, D. C., Jansen van Rensburg, A., Fowler, P. M., Bender, A. M., Stevens, D., Sullivan, K. O., Fullagar, H. H. K., Alonso, J.-M., Biggins, M., Claassen-Smithers, A., Collins, R., Dohi, M., Driller, M. W., Dunican, I. C., Gupta, L., Halson, S. L., Lastella, M., Miles, K. H., Nedelec, M., . . . Botha, T. (2021). Managing travel fatigue and jet lag in athletes: A review and consensus statement. <i>Sports Medicine, 51</i>(10), 2029–2050. https://doi.org/10.1007/s40279-021-01502-0</li>
+    <li>Kocak, A., Georgousopoulou, E., Knight-Agarwal, C. R., Matthews, R. y Minehan, M. (2025). The effect of consuming caffeine before late afternoon/evening training or competition on sleep: A systematic review with meta-analysis. <i>Sports, 13</i>(9), 317. https://doi.org/10.3390/sports13090317</li>
+    <li>Mason, L., Connolly, J., Devenney, L. E., Lacey, K., O'Donovan, J. y Doherty, R. (2023). Sleep, nutrition, and injury risk in adolescent athletes: A narrative review. <i>Nutrients, 15</i>(24), 5101. https://doi.org/10.3390/nu15245101</li>
+    <li>Rebello, L. J., Roberts, A. W., Fenuta, A. M., Cote, A. T. y Bodner, M. E. (2022). Sleep quality and sleep behaviors in varsity athletes: A pilot study. <i>Frontiers in Sports and Active Living, 4</i>, 906663. https://doi.org/10.3389/fspor.2022.906663</li>
+    <li>Roach, G. D. y Sargent, C. (2019). Interventions to minimize jet lag after westward and eastward flight. <i>Frontiers in Physiology, 10</i>, 927. https://doi.org/10.3389/fphys.2019.00927</li>
+    <li>Zhang, B., Bender, A., Tan, X., Wang, X., Le, S. y Cheng, S. (2022). Assessment of sleep disturbances with the athlete sleep screening questionnaire in Chinese athletes. <i>Sports Medicine and Health Science, 4</i>(2), 133–139. https://doi.org/10.1016/j.smhs.2022.02.001</li>
+  </ol></details>
+</footer>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const DAY=1440;
+const toMin=s=>{if(!s)return 0;const [h,m]=s.split(':').map(Number);return h*60+m;};
+const mod=(m,n)=>((m%n)+n)%n;
+const hhmm=m=>{m=Math.round(mod(m,DAY));return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');};
+const dec=(x,d=1)=>{const r=Math.round(x*Math.pow(10,d))/Math.pow(10,d);return (Number.isInteger(r)?String(r):r.toFixed(d)).replace('.',',');};
+const durTxt=m=>{m=Math.round(m);const h=Math.floor(Math.abs(m)/60),mm=Math.abs(m)%60;return (m<0?'−':'')+(h?h+' h':'')+(h&&mm?' ':'')+(mm?mm+' min':(h?'':'0 min'));};
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+function card(kind,tag,title,body,cite){return `<div class="card ${kind}"><h4><span class="tag">${tag}</span>${title}</h4><p>${body}</p>${cite?`<div class="cite">${cite}</div>`:''}</div>`;}
+function segVal(id){return document.querySelector('#'+id+' button.on').dataset.v;}
+function segSet(id,v){document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset.v===String(v)));}
+document.querySelectorAll('.seg').forEach(s=>s.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;s.querySelectorAll('button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');renderAll();}));
+
+/* ---------- tema ---------- */
+const root=document.documentElement;
+function setTheme(t){root.setAttribute('data-theme',t);$('theme').textContent=t==='dark'?'☀ Modo claro':'☾ Modo oscuro';try{localStorage.setItem('tema-sueno',t);}catch(e){}}
+function toggleTheme(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');}
+let t0=null;try{t0=localStorage.getItem('tema-sueno');}catch(e){}
+if(!t0)t0=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+setTheme(t0);$('theme').addEventListener('click',toggleTheme);
+/* ---------- tabs ---------- */
+const tabs=[...document.querySelectorAll('nav button')];
+function show(id){tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.t===id));document.querySelectorAll('section.tab').forEach(s=>s.classList.toggle('on',s.id===id));}
+tabs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.t)));
+document.addEventListener('keydown',e=>{const t=e.target;if(t.tagName==='SELECT'||t.tagName==='TEXTAREA'||(t.tagName==='INPUT'&&['time','date','number','text'].includes(t.type)))return;if(['1','2','3','4'].includes(e.key))show('t'+e.key);if(e.key==='d'||e.key==='D')toggleTheme();});
+
+/* ================= 1. HORA DE DORMIR ================= */
+function relEve(m){return m<5*60?m+DAY:m;} /* 00:00–04:59 se toma como madrugada de esta noche */
+function renderPlanner(){
+  const W=toMin($('p_wake').value), H=+$('p_hours').value;
+  $('p_hours_v').textContent=dec(H,2)+' h';
+  const wakeR=W+DAY, bedR=wakeR-H*60;
+  const trOn=$('p_tr_on').checked, cafOn=$('p_caf_on').checked, ocs=$('p_ocs').checked;
+  $('p_tr_box').classList.toggle('off',!trOn); $('p_caf_box').classList.toggle('off',!cafOn);
+  const trR=relEve(toMin($('p_tr_end').value)), dinR=relEve(toMin($('p_dinner').value)), cafR=relEve(toMin($('p_caf').value));
+  const cutH=ocs?10:6, cutR=bedR-cutH*60;
+  $('r_bed').textContent=hhmm(bedR);
+  $('r_bed_d').textContent=`Así tiene ${dec(H,2)} h en la cama hasta las ${hhmm(W)}`;
+  $('r_din').textContent=hhmm(bedR-240);
+  $('r_cafcut').textContent=hhmm(cutR);
+  $('r_cafcut_d').textContent=ocs?'Con anticonceptivos orales el café tarda más en irse: dejar 8–10 h antes de acostarse':'Como mínimo 6 h antes de acostarse';
+  let c='';
+  if(trOn){
+    const gap=bedR-trR;
+    if(gap<=0) c+=card('bad','Entreno',gap===0?'Termina justo a su hora de acostarse':`Termina ${durTxt(-gap)} después de su hora de acostarse`,`Así no llega a ${dec(H,2)} h en la cama: como mucho tendría ${dec((wakeR-trR)/60,1)} h si se acuesta al terminar. Una siesta de 20 min al día siguiente ayuda a compensar.`,'Cunha et al. (2023)');
+    else if(gap<120) c+=card('mid','Entreno',`Acaba ${durTxt(gap)} antes de acostarse`,`Si el ejercicio acaba 2–3 h antes de dormir, no se vio que empeore el sueño. Con menos margen hay pocos datos, así que conviene ver cómo duerme.`,'Coel et al. (2023)');
+    else c+=card('ok','Entreno',`Acaba ${durTxt(gap)} antes de acostarse`,`Hay margen suficiente: el ejercicio ${$('p_tr_int').value==='vig'?'intenso':'moderado'} unas horas antes de acostarse no empeoró cuánto ni cómo se duerme.`,'Coel et al. (2023)');
+  }
+  const dg=bedR-dinR;
+  if(dg<0) c+=card('bad','Cena','Cena después de su hora de acostarse',`Conviene adelantarla. Lo que mejor funcionó fue cenar 4 h antes (${hhmm(bedR-240)}).`,'Doherty et al. (2019)');
+  else if(dg<60) c+=card('mid','Cena',`Cena ${durTxt(dg)} antes de acostarse`,'Muy pegada a la cama. En el estudio, con una cena de índice glucémico alto (sube mucho el azúcar en sangre) tardaron 14,6 min en dormirse si cenaron 1 h antes y 9 min si cenaron 4 h antes.','Doherty et al. (2019)');
+  else if(dg<240) c+=card('mid','Cena',`Cena ${durTxt(dg)} antes de acostarse`,`Aceptable. Lo que mejor funcionó fue cenar 4 h antes (${hhmm(bedR-240)}): tardaron 9 min en dormirse, frente a 14,6 min cenando 1 h antes. Ojo: es un solo estudio.`,'Doherty et al. (2019)');
+  else c+=card('ok','Cena',`Cena ${durTxt(dg)} antes de acostarse`,'Coincide con lo que mejor funcionó: con una cena de índice glucémico alto (sube mucho el azúcar) 4 h antes tardaron 9 min en dormirse, frente a 17,5 min con una de índice bajo. Es un solo estudio.','Doherty et al. (2019)');
+  if(cafOn){
+    const cg=bedR-cafR;
+    if(cafR<=cutR) c+=card('ok','Cafeína',`Última toma ${durTxt(cg)} antes de acostarse`,`Está dentro del margen de ${cutH} h. Aun así, cada persona reacciona distinto a la cafeína.`,'Kocak et al. (2025)');
+    else c+=card(cg<180?'bad':'mid','Cafeína',`Solo ${durTxt(Math.max(cg,0))} antes de acostarse`,`Está fuera del margen de ${cutH} h. Incluso tomada 6 h antes de dormir, la cafeína quitó 41 min de sueño${ocs?'. Con anticonceptivos tarda casi el doble en eliminarse':''}.`,'Kocak et al. (2025)');
+  }
+  c+=card('info','Pantallas','Trabajarlo, pero no es lo primero','Quitar el móvil no mejoró nada en los 2 estudios con deportistas. Lo primero es dormir más tiempo.','Cunha et al. (2023)');
+  if(H<8) c+=card('mid','Duración',`${dec(H,2)} h en la cama se queda corto`,'Los estudios que mejoraron el rendimiento pedían 9–10 h en la cama y conseguían entre 46 y 113 min más de sueño por noche.','Cunha et al. (2023)');
+  $('p_cards').innerHTML=c;
+  /* timeline */
+  const svg=$('p_svg');svg.innerHTML='';
+  const evs=[bedR,wakeR];if(trOn)evs.push(trR-90);evs.push(dinR);if(cafOn)evs.push(cafR);evs.push(cutR);
+  const a0=Math.floor((Math.min(...evs)-60)/60)*60, a1=Math.ceil((wakeR+60)/60)*60, X=m=>20+(m-a0)/(a1-a0)*960;
+  for(let t=a0;t<=a1;t+=60){const big=(t%180===0);el('line',{x1:X(t),x2:X(t),y1:big?86:90,y2:96,stroke:'var(--tick)','stroke-width':1},svg);if(big)el('text',{x:X(t),y:112,'text-anchor':'middle','font-size':12,fill:'var(--grey)'},svg,hhmm(t));}
+  el('line',{x1:20,x2:980,y1:96,y2:96,stroke:'var(--line)'},svg);
+  if(cutR<bedR) el('rect',{x:X(cutR),y:22,width:X(bedR)-X(cutR),height:58,fill:'var(--coral-soft)'},svg);
+  el('rect',{x:X(bedR),y:22,width:X(wakeR)-X(bedR),height:58,rx:4,fill:'var(--sleepbar)'},svg);
+  el('text',{x:(X(bedR)+X(wakeR))/2,y:56,'text-anchor':'middle','font-size':15,fill:'#fff','font-weight':'bold'},svg,`${hhmm(bedR)} – ${hhmm(wakeR)}`);
+  if(trOn){el('rect',{x:X(trR-90),y:30,width:X(trR)-X(trR-90),height:42,rx:4,fill:'#00918F'},svg);el('text',{x:X(trR)-6,y:56,'text-anchor':'end','font-size':13,fill:'#fff'},svg,'Entreno');}
+  const mark=(m,col,label,y)=>{el('line',{x1:X(m),x2:X(m),y1:14,y2:86,stroke:col,'stroke-width':3},svg);el('text',{x:X(m)+5,y:y,'font-size':12,fill:col,'font-weight':'bold'},svg,label);};
+  mark(dinR,'var(--amber)','Cena '+hhmm(dinR),12);
+  if(cafOn) mark(cafR,'var(--coral)','Café '+hhmm(cafR),28);
+}
+
+/* ================= 2. JET LAG ================= */
+const CITIES=[["Madrid","Europe/Madrid"],["Canarias","Atlantic/Canary"],["Lisboa","Europe/Lisbon"],["Londres","Europe/London"],["París","Europe/Paris"],["Estambul","Europe/Istanbul"],["Moscú","Europe/Moscow"],["El Cairo","Africa/Cairo"],["Johannesburgo","Africa/Johannesburg"],["Riad","Asia/Riyadh"],["Doha","Asia/Qatar"],["Dubái","Asia/Dubai"],["Nueva Delhi","Asia/Kolkata"],["Bangkok","Asia/Bangkok"],["Singapur","Asia/Singapore"],["Pekín","Asia/Shanghai"],["Seúl","Asia/Seoul"],["Tokio","Asia/Tokyo"],["Sídney","Australia/Sydney"],["Melbourne","Australia/Melbourne"],["Auckland","Pacific/Auckland"],["Honolulu","Pacific/Honolulu"],["Los Ángeles","America/Los_Angeles"],["Ciudad de México","America/Mexico_City"],["Chicago","America/Chicago"],["Nueva York","America/New_York"],["Miami","America/New_York"],["Toronto","America/Toronto"],["Bogotá","America/Bogota"],["Lima","America/Lima"],["Caracas","America/Caracas"],["Santiago de Chile","America/Santiago"],["Buenos Aires","America/Argentina/Buenos_Aires"],["Montevideo","America/Montevideo"],["São Paulo","America/Sao_Paulo"]];
+['j_from','j_to'].forEach(id=>{$(id).innerHTML=CITIES.map((c,i)=>`<option value="${i}">${c[0]}</option>`).join('');});
+$('j_from').value='0';$('j_to').value=String(CITIES.findIndex(c=>c[0]==='Tokio'));
+$('j_date').value=new Date().toISOString().slice(0,10);
+function tzOffset(tz,date){
+  const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const p={};f.formatToParts(date).forEach(x=>p[x.type]=x.value);
+  return (Date.UTC(+p.year,+p.month-1,+p.day,+p.hour%24,+p.minute)-Math.floor(date.getTime()/60000)*60000)/3600000;
+}
+function strip(segs,cbt,mel,sleep){
+  const w=360,h=22,X=m=>mod(m,DAY)/DAY*w;let s=`<svg width="100%" height="34" viewBox="0 0 ${w} 34" preserveAspectRatio="none"><rect x="0" y="8" width="${w}" height="${h}" fill="var(--bg2)"/>`;
+  const band=(a,b,fill)=>{const L=b-a;const st=mod(a,DAY);if(st+L<=DAY){s+=`<rect x="${X(st)}" y="8" width="${L/DAY*w}" height="${h}" fill="${fill}"/>`;}else{s+=`<rect x="${X(st)}" y="8" width="${(DAY-st)/DAY*w}" height="${h}" fill="${fill}"/><rect x="0" y="8" width="${(st+L-DAY)/DAY*w}" height="${h}" fill="${fill}"/>`;}};
+  band(sleep[0],sleep[1],'var(--nightband)');
+  segs.forEach(g=>band(g[0],g[1],g[2]));
+  [360,720,1080].forEach(t=>s+=`<line x1="${X(t)}" x2="${X(t)}" y1="8" y2="30" stroke="var(--card)" stroke-width="1"/>`);
+  s+=`<path d="M${X(cbt)-6} 0 L${X(cbt)+6} 0 L${X(cbt)} 8 Z" fill="var(--coral)"/>`;
+  if(mel!=null) s+=`<circle cx="${X(mel)}" cy="19" r="5" fill="var(--card)" stroke="var(--navy)" stroke-width="2"/>`;
+  return s+'</svg>';
+}
+function renderJet(){
+  const d=new Date($('j_date').value+'T12:00:00Z'); const date=isNaN(d)?new Date():d;
+  const A=CITIES[+$('j_from').value],B=CITIES[+$('j_to').value];
+  let diff=tzOffset(B[1],date)-tzOffset(A[1],date);
+  if(diff>12)diff-=24; if(diff<=-12)diff+=24;
+  const east=diff>0,N=Math.abs(diff);
+  const bed=toMin($('j_bed').value),wake=toMin($('j_wake').value),mel=$('j_mel').checked;
+  document.querySelectorAll('.melcol').forEach(e=>e.style.display=mel?'':'none');
+  $('j_diff').innerHTML=`${dec(N,1)} <small>${N===1?'huso':'husos'}</small>`;
+  $('j_dir').textContent=N===0?`${A[0]} y ${B[0]} tienen la misma hora`:`Hacia el ${east?'este':'oeste'}: el reloj del cuerpo tiene que ${east?'adelantarse':'retrasarse'} ${dec(N,1)} h`;
+  const rate=east?60:120; /* min de ajuste por día */
+  const days=N*60/rate;
+  $('j_days').innerHTML=N<3?`— <small></small>`:`≈ ${dec(days,1)} <small>${days===1?'día':'días'}</small>`;
+  $('j_rule').textContent=east?'1 día por huso hacia el este (1 h al día)':'Medio día por huso hacia el oeste (2 h al día)';
+  const target=mod(wake-180,DAY); /* CBTmin en casa */
+  const sleepLen=mod(wake-bed,DAY);
+  const inSleep=m=>mod(m-bed,DAY)<=sleepLen;
+  let rows='',part=null;const nDays=N<3?0:Math.ceil(days);
+  for(let k=0;k<=Math.max(nDays,0);k++){
+    const lag=Math.max(0,N*60-rate*k);
+    const cbt=mod(target+(east?lag:-lag),DAY);
+    if(part===null&&inSleep(cbt))part=k;
+    let seek,avoid;
+    if(east){avoid=[cbt-180,cbt];seek=[cbt,cbt+180];}else{seek=[cbt-180,cbt];avoid=[cbt,cbt+180];}
+    const melT=lag===0?null:(east?cbt-690:cbt+240);
+    const fmt=w=>{const a=hhmm(w[0]),b=hhmm(w[1]);const sl=inSleep(w[0]+90);return `${a}–${b}${sl?' <span style="color:var(--grey)">(durmiendo)</span>':''}`;};
+    rows+=`<tr><td class="day">Día ${k}${k===0?' <span style="font-weight:normal;color:var(--grey)">llegada</span>':''}${lag===0?'<span class="pill">adaptado</span>':''}</td><td class="strip">${strip(lag===0?[]:[[seek[0],seek[1],'#F4C542'],[avoid[0],avoid[1],'var(--darkseg)']],cbt,mel?melT:null,[bed,bed+sleepLen])}</td><td>${lag===0?'Rutina normal':fmt(seek)}</td><td>${lag===0?'—':fmt(avoid)}</td><td class="melcol" style="display:${mel?'':'none'}">${melT==null?'—':hhmm(melT)}</td></tr>`;
+  }
+  if(N<3) rows=`<tr><td colspan="5" style="padding:14px 8px">Con menos de 3 husos no se considera jet lag. Lo que pesa es el cansancio del viaje: dormir bien antes, durante y después.</td></tr>`;
+  $('j_tbody').innerHTML=rows;
+  $('j_part').textContent=N<3?'—':(part===null?`Día ${nDays}`:`Día ${part}`);
+  let c='';
+  if(N>=3){
+    c+=card('info','Antes de viajar',`Mover el horario 3–4 días antes`,`Cada día, acostarse y levantarse 30–60 min ${east?'antes':'más tarde'}, con más luz ${east?'por la mañana':'por la tarde-noche'} y menos luz ${east?'por la noche':'por la mañana'}.`,'Roach y Sargent (2019)');
+    c+=card(east?'mid':'ok','Dirección',east?'Hacia el este cuesta el doble':'Hacia el oeste es más fácil',east?'Hay que adelantar el reloj. Tomar el sol nada más llegar puede ir en contra si es antes de su punto más bajo: seguir las horas del plan.':'Alargar el día es más fácil. Buscar luz por la tarde y evitarla a primera hora.','Janse van Rensburg et al. (2021); Roach y Sargent (2019)');
+    if(east&&N>=10) c+=card('mid','Muchos husos',`${dec(N,1)} husos hacia el este`,'Con tantas horas de diferencia, Roach y Sargent proponen retrasar el reloj en vez de adelantarlo, que es lo más habitual. Este cálculo sigue la regla del consenso.','Roach y Sargent (2019)');
+    c+=card('info','Si cae dormido de día','Siesta de 1 h como máximo','Así no le quita sueño a la noche. Si tiene que salir cuando toca evitar la luz, usar gafas de sol muy oscuras que envuelvan.','Roach y Sargent (2019)');
+    if(mel) c+=card('mid','Melatonina','3 mg a la hora del plan','La dosis de 3 mg mueve el reloj de forma más fiable que la de 0,5 mg. Si la hora cae durmiendo, solo se toma si está despierto. Antes de usarla, revisar el producto por antidopaje.','Roach y Sargent (2019)');
+  }
+  c+=card('info','Consenso','Regla práctica, no ensayo','La proponen 26 expertos, pero ningún ensayo la ha comprobado en deportistas.','Janse van Rensburg et al. (2021)');
+  $('j_cards').innerHTML=c;
+}
+
+/* ================= 3. CAFEÍNA ================= */
+function renderCaf(){
+  const kg=+$('c_kg').value,dose=+$('c_dose').value,hl=+segVal('c_hl');
+  $('c_kg_v').textContent=kg+' kg';$('c_dose_v').textContent=dec(dose,1)+' mg/kg';
+  const mg=kg*dose;const T=toMin($('c_time').value),Bd=toMin($('c_bed').value);
+  let gap=mod(Bd-T,DAY);
+  const left=mg*Math.pow(0.5,gap/60/hl);const pct=left/mg*100;
+  const ocs=hl>7;const cutH=ocs?10:6;
+  $('c_mg').innerHTML=`${Math.round(mg)} <small>mg</small>`;
+  $('c_mg_d').textContent=`${dec(dose,1)} mg/kg × ${kg} kg`;
+  $('c_left').innerHTML=`${Math.round(left)} <small>mg</small>`;
+  $('c_left_d').textContent=`${Math.round(pct)} % de la dosis, ${durTxt(gap)} después de tomarla`;
+  $('c_left_box').classList.toggle('warn',gap<cutH*60);
+  $('c_cut').textContent=hhmm(Bd-cutH*60);
+  $('c_cut_d').textContent=ocs?'Con anticonceptivos orales la cafeína tarda más en irse: dejar 10 h antes de acostarse':'Como mínimo 6 h antes de acostarse. Aun así, tomada a esa hora quitó 41 min de sueño en un estudio';
+  /* chart */
+  const svg=$('c_svg');svg.innerHTML='';
+  const span=18*60,X=m=>60+m/span*910,Y=v=>200-v/mg*175;
+  for(let p=0;p<=1;p+=0.25){el('line',{x1:60,x2:970,y1:Y(mg*p),y2:Y(mg*p),stroke:p===0?'var(--tick)':'var(--grid)'},svg);el('text',{x:52,y:Y(mg*p)+4,'text-anchor':'end','font-size':12,fill:'var(--grey)'},svg,Math.round(mg*p)+' mg');}
+  for(let t=0;t<=span;t+=120)el('text',{x:X(t),y:220,'text-anchor':'middle','font-size':12,fill:'var(--grey)'},svg,hhmm(T+t));
+  const cutRel=mod(Bd-cutH*60-T,DAY);
+  if(gap<=span){el('rect',{x:X(gap),y:25,width:Math.min(X(span),X(gap+480))-X(gap),height:175,fill:'var(--band)'},svg);el('text',{x:X(gap)+8,y:40,'font-size':13,fill:'var(--navy)','font-weight':'bold'},svg,'Sueño (8 h)');}
+  let d='';for(let t=0;t<=span;t+=10){d+=(t?'L':'M')+X(t).toFixed(1)+' '+Y(mg*Math.pow(.5,t/60/hl)).toFixed(1)+' ';}
+  el('path',{d:d+`L${X(span)} 200 L${X(0)} 200 Z`,fill:'rgba(217,74,38,.14)'},svg);
+  el('path',{d,fill:'none',stroke:'var(--coral)','stroke-width':2.5},svg);
+  if(gap<=span){el('line',{x1:X(gap),x2:X(gap),y1:25,y2:200,stroke:'var(--navy)','stroke-width':2},svg);
+    el('circle',{cx:X(gap),cy:Y(left),r:5,fill:'var(--card)',stroke:'var(--coral)','stroke-width':2.5},svg);
+    el('text',{x:X(gap)+8,y:Y(left)-8,'font-size':13,fill:'var(--ink)','font-weight':'bold'},svg,`${Math.round(left)} mg al acostarse (${hhmm(Bd)})`);}
+  el('text',{x:X(0)+8,y:Y(mg)-6,'font-size':13,fill:'var(--ink)'},svg,`Toma ${hhmm(T)}`);
+  for(let k=1;k*hl*60<=span;k++){const t=k*hl*60;el('circle',{cx:X(t),cy:Y(mg/Math.pow(2,k)),r:2.5,fill:'var(--coral)'},svg);if(k<=2&&Math.abs(t-gap)>90)el('text',{x:X(t)+5,y:Y(mg/Math.pow(2,k))-6,'font-size':11,fill:'var(--grey)'},svg,k===1?`la mitad a las ${dec(hl,1)} h`:`un cuarto a las ${dec(k*hl,1)} h`);}
+}
+
+/* ================= 4. CRONOTIPO ================= */
+function renderChrono(){
+  const type=segVal('k_type'),W=toMin($('k_wake').value),Tr=toMin($('k_train').value),S=+$('k_slept').value;
+  $('k_slept_v').textContent=dec(S,1)+' h';
+  const awake=mod(Tr-W,DAY)/60;
+  $('k_awake').innerHTML=`${dec(awake,1)} <small>h</small>`;
+  $('k_awake_d').textContent=`De ${hhmm(W)} a ${hhmm(Tr)}`;
+  const short=S<7, pm=Tr>=12*60;
+  if(short){
+    $('k_drop').innerHTML=`≈ ${dec(awake*0.4,1)} <small>%</small>`;$('k_drop_box').classList.add('warn');
+    $('k_drop_d').textContent=`Alrededor de un 0,4 % menos de rendimiento por cada hora despierto tras dormir poco (Craven et al., 2022)${pm?'. Por la tarde la caída es mayor que por la mañana':''}`;
+  } else {
+    $('k_drop').innerHTML='—';$('k_drop_box').classList.remove('warn');
+    $('k_drop_d').textContent='Ha dormido 7 h o más: este cálculo es solo para cuando se ha dormido poco (Craven et al., 2022)';
+  }
+  const napEnd=Tr-30,napStart=napEnd-20;
+  if(short&&mod(napStart-W,DAY)>=60&&mod(napStart-W,DAY)<mod(Tr-W,DAY)){
+    $('k_nap').textContent=hhmm(napStart);$('k_nap_d').textContent=`20 min, hasta las ${hhmm(napEnd)}: así quedan 30 min libres antes de entrenar para quitarse la pesadez de despertar (Cunha et al., 2023)`;
+  } else if(short){$('k_nap').textContent='Sin hueco';$('k_nap_d').textContent='La sesión está demasiado cerca de la hora de levantarse';}
+  else {$('k_nap').textContent='Opcional';$('k_nap_d').textContent='Tras una noche normal no es imprescindible';}
+  let c='';
+  if(type==='v') c+=card('bad','Riesgo','Vespertino: más dificultad para dormir','Los vespertinos tenían 2,25 veces más probabilidad de tener dificultad moderada o grave para dormir (rango: 1,44–3,52). Conviene pasarles antes el cuestionario ASSQ.','Zhang et al. (2022)');
+  else c+=card('ok','Riesgo',type==='m'?'Matutino: grupo de referencia':'Intermedio: grupo de referencia','En Zhang et al. (2022), matutinos e intermedios fueron el grupo de comparación y tenían menos dificultad para dormir que los vespertinos.','Zhang et al. (2022)');
+  if(Tr<8*60) c+=card(type==='v'?'bad':'mid','Horario',`Sesión a las ${hhmm(Tr)}: antes de las 8:00`,`Entrenar antes de las 8:00 es uno de los factores del deporte que recortan el sueño.${type==='v'?' A un vespertino le cuesta más, porque su reloj va retrasado.':''}`,'Driller et al. (2023); Mason et al. (2023)');
+  else if(Tr>=18*60) c+=card(type==='m'?'mid':'info','Horario',`Sesión a las ${hhmm(Tr)}: después de las 18:00`,`Competir tarde también recorta el sueño, y es lo habitual: el 65 % de los universitarios entrena después de las 19 h. Dejar 2–3 h hasta acostarse.${type==='m'?' Un matutino termina muy cerca de su hora natural de dormir.':''}`,'Driller et al. (2023); Rebello et al. (2022); Coel et al. (2023)');
+  else c+=card('ok','Horario',`Sesión a las ${hhmm(Tr)}`,'No cae en las franjas que más recortan el sueño (antes de las 8:00 y después de las 18:00).','Driller et al. (2023)');
+  if(short) c+=card('mid','Noche corta',`${dec(S,1)} h de sueño`,'Menos de 7 h. Tras dormir poco, lo que más cae es la habilidad técnica (−20,9 %) y lo que menos la fuerza (−2,85 %).','Craven et al. (2022)');
+  c+=card('info','Viajes',type==='m'?'Se adapta mejor yendo al este':type==='v'?'Se adapta mejor yendo al oeste':'Sin ventaja clara',type==='m'?'A los matutinos les cuesta menos adelantar el reloj.':type==='v'?'A los vespertinos les cuesta menos retrasar el reloj.':'El consenso solo describe las diferencias entre matutinos y vespertinos.','Janse van Rensburg et al. (2021)');
+  $('k_cards').innerHTML=c;
+}
+
+/* ---------- presets ---------- */
+const setv=(id,v)=>{$(id).value=v;};
+const P1={base:{p_wake:'07:30',p_hours:9,p_tr_on:true,p_tr_end:'19:30',p_tr_int:'mod',p_dinner:'20:30',p_caf_on:true,p_caf:'16:00',p_ocs:false},
+  tarde:{p_wake:'07:30',p_hours:9,p_tr_on:true,p_tr_end:'22:30',p_tr_int:'vig',p_dinner:'23:00',p_caf_on:true,p_caf:'20:00',p_ocs:false},
+  madruga:{p_wake:'06:00',p_hours:8.5,p_tr_on:true,p_tr_end:'19:00',p_tr_int:'mod',p_dinner:'21:00',p_caf_on:true,p_caf:'15:00',p_ocs:true}};
+document.querySelectorAll('[data-p1]').forEach(b=>b.addEventListener('click',()=>{const p=P1[b.dataset.p1];for(const k in p){if(typeof p[k]==='boolean')$(k).checked=p[k];else setv(k,p[k]);}renderAll();}));
+const ci=n=>String(CITIES.findIndex(c=>c[0]===n));
+const P2={tokio:['Madrid','Tokio'],ny:['Madrid','Nueva York'],sydney:['Madrid','Sídney']};
+document.querySelectorAll('[data-p2]').forEach(b=>b.addEventListener('click',()=>{const p=P2[b.dataset.p2];$('j_from').value=ci(p[0]);$('j_to').value=ci(p[1]);setv('j_bed','23:00');setv('j_wake','07:00');renderAll();}));
+const P3={partido:{c_kg:75,c_dose:3,c_time:'19:00',c_bed:'00:00',hl:5},manana:{c_kg:70,c_dose:3,c_time:'09:00',c_bed:'23:00',hl:5},ocs:{c_kg:60,c_dose:3,c_time:'17:00',c_bed:'23:00',hl:10.7}};
+document.querySelectorAll('[data-p3]').forEach(b=>b.addEventListener('click',()=>{const p=P3[b.dataset.p3];['c_kg','c_dose','c_time','c_bed'].forEach(k=>setv(k,p[k]));segSet('c_hl',p.hl);renderAll();}));
+const P4={buho:{t:'v',w:'06:30',tr:'07:30',s:6},alondra:{t:'m',w:'06:30',tr:'21:00',s:7.5},partido:{t:'i',w:'08:00',tr:'20:00',s:5.5}};
+document.querySelectorAll('[data-p4]').forEach(b=>b.addEventListener('click',()=>{const p=P4[b.dataset.p4];segSet('k_type',p.t);setv('k_wake',p.w);setv('k_train',p.tr);setv('k_slept',p.s);renderAll();}));
+
+function renderAll(){renderPlanner();renderJet();renderCaf();renderChrono();}
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',renderAll);e.addEventListener('change',renderAll);});
+renderAll();
+})();
+</script>
+</body>
+</html>
